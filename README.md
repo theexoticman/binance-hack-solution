@@ -16,45 +16,11 @@ EIP-7702, it cannot gain unrestricted authority over the Safe.
 
 ## The security model
 
-```mermaid
-flowchart BT
-    LEAD["<b>Leadership Multisig</b><br/>3-of-5 · full control<br/>owners · sessions · modules<br/>policies · revocation"]
-
-    subgraph SAFE["<b>Safe Smart Account</b>"]
-        FUNDS["<b>Funds</b><br/>ETH · USDC · Other Assets"]
-    end
-
-    subgraph POLICY["<b>On-Chain Policy Enforcement</b>"]
-        subgraph PROW[" "]
-            direction LR
-            P1["Address<br/>Whitelist"]
-            P2["Spending<br/>Limits"]
-            P3["Allowed<br/>Functions"]
-            P4["Expiry &<br/>Gas Limits"]
-            P1 ~~~ P2 ~~~ P3 ~~~ P4
-        end
-    end
-
-    K1["<b>Deposit / Sweep</b><br/>session key"]
-    K2["<b>Customer Withdrawals</b><br/>session key"]
-    K3["<b>Treasury / Liquidity</b><br/>session key"]
-    K4["<b>Staking</b><br/>session key"]
-
-    SAFE ~~~ LEAD
-    K1 & K2 & K3 & K4 -- "restricted" --> POLICY
-    POLICY -- "authorized execution only" --> SAFE
-    LEAD == "Ownership & Administration" ==> SAFE
-
-    style SAFE fill:#02f93212,stroke:#02f932,stroke-width:4px
-    style FUNDS fill:#02f932,stroke:#01b324,stroke-width:2px,color:#000
-    style LEAD stroke:#02f932,stroke-width:2px
-    style POLICY fill:#8882,stroke:#888,stroke-width:2px,stroke-dasharray:6 4
-    style PROW fill:none,stroke:none
-```
+![Security model: a Safe smart account holds the funds and is controlled by a 3-of-5 leadership multisig; a withdrawal session key and a treasury session key reach the funds only through restricted execution, each bound by its own session policies](images/diagram.png)
 
 **The Safe holds the funds. Leadership controls the Safe. Exchange infrastructure operates through restricted session keys, with every authorized session execution subject to on-chain policy enforcement.**
 
-<sub>The four session-key roles are illustrative; the demo runs a single payout session. Monitoring deposits needs no Safe permissions, only sweeping them does. Withdrawals to arbitrary customer addresses need an additional authorization layer that this template does not include.</sub>
+<sub>The withdrawal and treasury sessions are illustrative; the demo runs a single payout session. Withdrawals to arbitrary customer addresses need an additional authorization layer that this template does not include.</sub>
 
 - **Leadership owns the funds.** Only the multisig can change owners, modules, sessions or
   policies, and only it can move funds without limits.
