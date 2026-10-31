@@ -1,0 +1,30 @@
+[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+libs = ["node_modules"]
+solc = "0.8.30"
+# Prague = Pectra: required for EIP-7702 (SET_CODE_TX / delegation designators).
+evm_version = "prague"
+optimizer = true
+optimizer_runs = 200
+bytecode_hash = "none"
+# Deterministic start time so period-based limits are easy to reason about in tests.
+block_timestamp = 1_750_000_000
+fs_permissions = [{ access = "read-write", path = "./deployments" }]
+
+[profile.default.lint]
+# Third-party sources under node_modules are not ours to lint.
+ignore = ["node_modules/**"]
+
+[fuzz]
+runs = 256
+
+[fmt]
+line_length = 110
+tab_width = 4
+bracket_spacing = true
+int_types = "long"
+quote_style = "double"
+number_underscore = "thousands"

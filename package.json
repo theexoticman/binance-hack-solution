@@ -1,0 +1,28 @@
+{
+  "name": "safe-session-security",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reference template: Safe custody + restricted session keys (Safe7579 + SmartSessions) with an EIP-7702 attack demonstration",
+  "license": "MIT",
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test && forge test --mc Erc7562ComplianceTest -vvv",
+    "demo": "./script/demo.sh"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "5.1.0",
+    "@rhinestone/checknsignatures": "github:rhinestonewtf/checknsignatures#c984c03cdefda75fdb82b6e9b552cdf3315d5242",
+    "@rhinestone/core-modules": "github:rhinestonewtf/core-modules#2eda90a",
+    "@rhinestone/flatbytes": "github:rhinestonewtf/flatbytes#8182dc7353bef886be234c54ae36b1e33d6bf8ee",
+    "@rhinestone/modulekit": "0.4.10",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.7",
+    "smartsessions": "github:erc7579/smartsessions#f5aaf867f7e22f3b9d746ce6f404f3a56833757f"
+  },
+  "pnpm": {
+    "overrides": {
+      "FreshCryptoLib": "-",
+      "freshcryptolib": "-",
+      "webauthn-sol": "-"
+    }
+  }
+}
