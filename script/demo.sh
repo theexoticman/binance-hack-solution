@@ -25,8 +25,12 @@ bold() { printf '\033[1m%s\033[0m\n' "$*"; }
 row() { printf '  %-52s %-8s %-6s %s\n' "$1" "$2" "$3" "$4"; }
 act() { echo; bold "$*"; row "" "Expected" "Result" "Why"; }
 say() { printf '  \033[2m%s\033[0m\n' "$*"; }
-check() { # expected actual
-  if [[ "$1" == "$2" ]]; then echo "ok"; else FAILURES=$((FAILURES + 1)); echo "MISMATCH"; fi
+# Print one scenario row and count mismatches. Must not be called inside $(...): a subshell
+# would lose the FAILURES increment and the script would report success regardless.
+verdict() { # label expected actual detail
+  local v=ok
+  if [[ "$2" != "$3" ]]; then FAILURES=$((FAILURES + 1)); v=MISMATCH; fi
+  row "$1" "$2" "$3" "$v  $4"
 }
 
 # ---------------------------------------------------------------- chain
@@ -82,7 +86,7 @@ user_op() { # label scenario expected sender_pk
   status=$(cast send "$ENTRYPOINT" "$(cat deployments/op.hex)" --private-key "$pk" --gas-limit 3000000 \
     --rpc-url "$RPC" --json 2>/dev/null | jq -r .status)
   [[ "$status" == "0x1" ]] && result=PASS || result=BLOCK
-  row "$label" "$expected" "$result" "$(check "$expected" "$result")  [$reason; tx status $status]"
+  verdict "$label" "$expected" "$result" "[$reason; tx status $status]"
 }
 
 eth() { cast balance "$1" --rpc-url "$RPC" --ether | awk '{printf "%g", $1}'; }
@@ -100,7 +104,7 @@ TX=$(cast send "$SESSION" --auth "$MALICIOUS" --private-key "$SESSION_PK" --gas-
 CODE=$(cast code "$SESSION" --rpc-url "$RPC" | tr 'A-F' 'a-f')
 EXPECTED_CODE="0xef0100$(echo "${MALICIOUS:2}" | tr 'A-F' 'a-f')"
 [[ "$CODE" == "$EXPECTED_CODE" ]] && DELEG=PASS || DELEG=BLOCK
-row "Session key delegates its EOA to MaliciousDelegation" PASS "$DELEG" "$(check PASS "$DELEG")  [type-$(echo "$TX" | jq -r .type | sed 's/0x//') tx; code $CODE_BEFORE -> ${CODE:0:16}...]"
+verdict "Session key delegates its EOA to MaliciousDelegation" PASS "$DELEG" "[type-$(echo "$TX" | jq -r .type | sed 's/0x//') tx; code $CODE_BEFORE -> ${CODE:0:16}...]"
 say "The stolen key now controls code running at the session address. It does not control the Safe."
 
 act "Act 3 - Attack: the malicious code tries to drain the Safe"
@@ -115,7 +119,7 @@ while read -r data; do
   say "  direct call: $route -> $([[ "$ok" == true ]] && echo SUCCEEDED || echo rejected)"
 done < <(echo "$TX" | jq -r --arg t "$TOPIC" '.logs[] | select(.topics[0] == $t) | .data')
 [[ "$SUCCESSES" == 0 ]] && DRAIN=BLOCK || DRAIN=PASS
-row "Drain via 9 direct routes (module, owner sigs, ...)" BLOCK "$DRAIN" "$(check BLOCK "$DRAIN")  [$SUCCESSES/9 succeeded]"
+verdict "Drain via 9 direct routes (module, owner sigs, ...)" BLOCK "$DRAIN" "[$SUCCESSES/9 succeeded]"
 user_op "Drain 10 ETH to attacker through the session" drain BLOCK "$SESSION_PK"
 user_op "Add attacker as a Safe owner" add-owner BLOCK "$SESSION_PK"
 user_op "Install an unrestricted module" install-module BLOCK "$SESSION_PK"
@@ -127,11 +131,11 @@ act "Act 4 - Leadership is still in control"
 forge script script/DeployDemo.s.sol --sig "leadershipAddOwner()" --rpc-url "$RPC" --broadcast --quiet >/dev/null
 OWNERS=$(cast call "$SAFE" 'getOwners()(address[])' --rpc-url "$RPC" | tr ',' '\n' | wc -l | tr -d ' ')
 [[ "$OWNERS" == 6 ]] && ADMIN=PASS || ADMIN=BLOCK
-row "3-of-5 multisig adds a new owner" PASS "$ADMIN" "$(check PASS "$ADMIN")  [owners now $OWNERS]"
+verdict "3-of-5 multisig adds a new owner" PASS "$ADMIN" "[owners now $OWNERS]"
 forge script script/DeployDemo.s.sol --sig "leadershipRevokeSession()" --rpc-url "$RPC" --broadcast --quiet >/dev/null
 ENABLED=$(cast call "$SMART_SESSION" 'isPermissionEnabled(bytes32,address)(bool)' "$(get permissionId)" "$SAFE" --rpc-url "$RPC")
 [[ "$ENABLED" == false ]] && REVOKED=PASS || REVOKED=BLOCK
-row "3-of-5 multisig revokes the compromised session" PASS "$REVOKED" "$(check PASS "$REVOKED")  [session enabled: $ENABLED]"
+verdict "3-of-5 multisig revokes the compromised session" PASS "$REVOKED" "[session enabled: $ENABLED]"
 user_op "Compromised key tries again after revocation" valid-eth BLOCK "$SESSION_PK"
 
 echo
