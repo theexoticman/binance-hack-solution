@@ -1,7 +1,9 @@
-# Security Review (pre-publication)
+# Security Review
 
-Internal adversarial review of this repository before publishing it as an **unaudited reference
-implementation**. It is not a substitute for an independent audit.
+This is the author's own adversarial review of the repository. It covers the gas, signature,
+mempool, accounting, privilege and licensing questions that matter most for this design, and
+links each claim to the tests that check it. It is **not** an independent audit, and the code
+remains an unaudited reference implementation.
 
 - **Pinned stack:** Safe 1.4.1 · Safe7579 1.0.0 · EntryPoint v0.7.0 · SmartSessions `f5aaf86` ·
   core-modules `2eda90a` (OwnableValidator) · solc 0.8.30 · EVM prague.
@@ -18,10 +20,10 @@ implementation**. It is not a substitute for an independent audit.
 | F3 | After an EIP-7702 delegation of the session EOA, its code can approve operations **for that session** without the key (OwnableValidator accepts `v = 0` contract signatures). No new authority, and no other session is affected. | Medium | Documented; remedy is revocation | `Malicious7702Delegation.t.sol::test_A_erc1271SignerHijack_…`, `test_A_cannotSwitchToAnotherSessionsPermissions`; code refs in §3 |
 | F4 | Re-enabling a revoked session with the **same key and salt** recreates the same permissionId and revives unused pre-signed operations. | Medium | Documented operational rule: never re-enable a revoked key; rotate keys or change the salt | `Revocation.t.sol::test_R_hazard_reEnableSameKeySameSaltRevivesPresignedOps`, `test_R_reEnableWithNewSaltOrNewKeyDoesNotRevive` |
 | F5 | Two sessions' ops in **one bundle** contend for the Safe's balance. The second can be validated, charged, and then revert. Over-count only; nothing moves. | Low | Documented; mitigation: one session per `handleOps` | `AccountingIsolation.t.sol::test_I_sameBundleBalanceContentionOverCountsOtherSession`, `test_I_separateBundlesRemoveContention` |
-| F6 | The earlier statement "public bundlers will reject the operations" was imprecise. Exactly one contract is non-compliant with ERC-7562: SpendingLimitPolicy, via `TIMESTAMP` (OP-011) and `BALANCE` (OP-080, native transfers only). | Info | **Corrected** in docs and **tested** | `Erc7562Compliance.t.sol` (§4) |
+| F6 | The default session's operations break the ERC-7562 public-mempool rules, so public bundlers may refuse them. Exactly one contract is the cause: SpendingLimitPolicy, via `TIMESTAMP` (OP-011) and `BALANCE` (OP-080, native transfers only). The rest of the stack is compliant. | Info | **Tested**; documented as a liveness constraint | `Erc7562Compliance.t.sol` (§4) |
 | F7 | `src/` policies compiled AGPL-3.0-only, GPL-3.0 and LGPL-3.0 sources through interface imports. Upstream licensing is ambiguous (§7). | Info (legal) | **Fixed** for `src/`: MIT-only, ABI-identical interfaces. Upstream: open | `script/check-licenses.sh`, `LicenseIsolation.t.sol` |
 
-## 2. Gas accounting (item 1)
+## 2. Gas accounting
 
 **Claim.** With SimpleGasPolicy and GasFeeCapPolicy on a session, the ETH that leaves the Safe for
 gas, to any bundler or into its EntryPoint deposit, over the life of that session's gas
@@ -70,7 +72,7 @@ The two counters are not merged on-chain: gas is lifetime-scoped and worst-case-
 is per-window. Merging them would couple two policies' state. Set `gasCostLimit` deliberately
 small and count it in the ETH risk budget.
 
-## 3. EIP-7702 and signature validation (item 2)
+## 3. EIP-7702 and signature validation
 
 **From the implementation.** `SignerLib.isValidISessionValidator` → `OwnableValidator.validateSignatureWithData`
 (`OwnableValidator.sol` L316) → `CheckSignatures.recoverNSignatures` (L339):
@@ -107,7 +109,7 @@ hijacked EOA, and a code-less signer cannot verify. All of this is tested:
 - If SmartSessions "enable mode" signatures were ever issued, revoke them with
   `SmartSession.revokeEnableSignature`. This template never issues them.
 
-## 4. ERC-7562 compatibility (item 3)
+## 4. ERC-7562 compatibility
 
 **Method.**
 
@@ -132,11 +134,10 @@ hijacked EOA, and a code-less signer cannot verify. All of this is tested:
   depends on the bundler.
 - Bundlers differ in optional rules.
 - Making SpendingLimitPolicy compliant needs a design without `TIMESTAMP`, e.g. time bounds
-  returned as `validAfter`/`validUntil` like TimeFramePolicy. That is not implemented (no new
-  functionality in this review).
+  returned as `validAfter`/`validUntil` like TimeFramePolicy. That is not implemented yet.
 - The private-bundler assumption remains, but it now applies to exactly one control.
 
-## 5. Spending accounting (item 4)
+## 5. Spending accounting
 
 - **Isolation:** usage is keyed by `ConfigId = f(account, permissionId, action)`, so one
   session's failed operations consume only its own budget
@@ -155,7 +156,7 @@ hijacked EOA, and a code-less signer cannot verify. All of this is tested:
     under-counting, i.e. a bypass. The template keeps validation-time accounting: it over-counts
     and never under-counts. `_hasBalance` and one-session-per-bundle reduce the over-count.
 
-## 6. Privilege isolation (item 5)
+## 6. Privilege isolation
 
 - **Inventory** (`test_P_inventoryOfExecutionPaths`): one Safe module (Safe7579); no guard;
   one Safe7579 validator (SmartSession); no executors; no global hook; no hooks on `execute`,
@@ -175,16 +176,16 @@ hijacked EOA, and a code-less signer cannot verify. All of this is tested:
   - `Safe.simulateAndRevert` (public DELEGATECALL, always reverts):
     `test_P_simulateAndRevertCannotPersistState`;
   - direct calls to the adapter singleton: `test_P_directCallsToAdapterSingletonAffectOnlyTheCaller`;
-  - earlier suites `PrivilegeEscalation.t.sol` and `Malicious7702Delegation.t.sol`.
+  - the targeted suites `PrivilegeEscalation.t.sol` and `Malicious7702Delegation.t.sol`.
 
-## 7. Licensing (item 6)
+## 7. Licensing
 
 `./script/check-licenses.sh` lists the SPDX tag of every source compiled into each deployed
 contract.
 
 | Component | Compiled sources | Notes |
 |---|---|---|
-| This repo's 4 policies (`src/`) | MIT only | Fixed in this review: `ISessionPolicy.sol` declares the ABI; `LicenseIsolation.t.sol` proves equality with upstream |
+| This repo's 4 policies (`src/`) | MIT only | `ISessionPolicy.sol` declares the ABI instead of importing it; `LicenseIsolation.t.sol` proves equality with upstream |
 | Safe, SafeProxy, SafeProxyFactory, MultiSendCallOnly | LGPL-3.0-only | LICENSE file present |
 | EntryPoint v0.7 | GPL-3.0 (+ LGPL, MIT) | `package.json` says ISC; LICENSE file and SPDX tags say GPL-3.0 |
 | Safe7579 | GPL-3.0, LGPL-3.0-only, MIT; `IERC7579Module.sol` has **no SPDX** | `package.json` GPL-3.0; **no LICENSE file upstream** |
@@ -201,7 +202,7 @@ contract.
 - `test/` and `script/` are MIT-tagged but import these dependencies. They are development
   tooling, not deployed.
 
-## 8. What is guaranteed, assumed, limited, or needs audit (item 7)
+## 8. What is guaranteed, assumed, limited, or needs audit
 
 | | Statement | Evidence / reason |
 |---|---|---|
@@ -219,5 +220,5 @@ contract.
 **Independent withdrawal authorization.** Exchanges pay previously unknown customer addresses.
 The next extension is a separate module: every withdrawal carries an authorization for its exact
 recipient, token, amount and nonce, from an independent signer, with aggregate limits enforced on
-chain. That would replace the static beneficiary whitelist for that flow. It is deliberately not
-part of this core, which should be published first as an explicitly unaudited reference.
+chain. That would replace the static beneficiary whitelist for that flow. It is deliberately
+kept out of this core so that the core stays small enough to review.

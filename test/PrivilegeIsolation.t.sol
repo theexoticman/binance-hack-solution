@@ -11,7 +11,7 @@ import { ISmartSession } from "smartsessions/ISmartSession.sol";
 import { ValidationData } from "smartsessions/DataTypes.sol";
 
 /**
- * Item 5 - privilege isolation, exhaustively.
+ * Test P - privilege isolation, exhaustively.
  *
  * 1. Sweep: every state-changing function of every deployed contract (66, generated from the
  *    compiled ABIs by script/gen-admin-surface.sh) is attempted by the session through every route:

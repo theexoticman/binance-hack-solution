@@ -1,5 +1,8 @@
 # Safe Session-Key Security Template
 
+[![CI](https://github.com/theexoticman/binance-hack-solution/actions/workflows/ci.yml/badge.svg)](https://github.com/theexoticman/binance-hack-solution/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **What if compromising an exchange's operational keys didn't mean compromising its funds?**
 
 This open-source reference implementation demonstrates how Safe smart accounts and restricted
@@ -57,13 +60,19 @@ Act 4 - Leadership is still in control
 
 ## Reproduce
 
-Requirements: [Foundry](https://getfoundry.sh) ≥ 1.0, pnpm, jq.
+Requirements: [Foundry](https://getfoundry.sh) ≥ 1.0, [pnpm](https://pnpm.io), jq.
 
 ```bash
-pnpm install        # pinned Solidity dependencies
+git clone https://github.com/theexoticman/binance-hack-solution.git
+cd binance-hack-solution
+pnpm install        # pinned Solidity dependencies (no install scripts are run)
 ./script/demo.sh    # the attack demonstration (local anvil chain, ~1 minute)
 pnpm test           # the test suite behind it
 ```
+
+`pnpm test` runs `forge test` and then the ERC-7562 suite a second time with `-vvv`. Those 7
+tests need Foundry's opcode tracer, so the first pass reports them as skipped and the second
+pass runs them.
 
 ## What's inside
 
@@ -92,6 +101,19 @@ The reusable policies in [`src/policies/`](src/policies) are this repository's o
 
 [`MaliciousDelegation.sol`](src/examples/MaliciousDelegation.sol) is the deliberately malicious
 EIP-7702 implementation used in the demo.
+
+```text
+src/
+  policies/      the four session policies and their shared base
+  libraries/     TransferLib: strict decoding of ETH and ERC-20 transfers
+  interfaces/    MIT copies of the SmartSessions policy interfaces
+  examples/      MaliciousDelegation, the attacker's EIP-7702 code
+script/
+  demo.sh        the attack demonstration
+  DeployDemo.s.sol, lib/SessionSetup.sol   deployment and session configuration
+test/            one file per attack category, plus shared fixtures in test/utils/
+docs/            architecture, threat model, security review, demo transcript
+```
 
 ## Add your own policy
 
@@ -127,10 +149,17 @@ business-hours policy).
 | [docs/ADDING_POLICIES.md](docs/ADDING_POLICIES.md) | Writing, testing and attaching a policy |
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Internal review: findings, test evidence, open items |
 
+## Contributing
+
+Issues and pull requests are welcome, especially new attack paths, new policies and
+corrections to the docs. See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow. If you find a
+way around the policies, please report it privately as described in [SECURITY.md](SECURITY.md)
+instead of opening a public issue.
+
 ## License
 
-Code in this repository is MIT, and the contracts in `src/` compile only MIT sources. The
-dependencies are licensed differently, including AGPL-3.0 parts of SmartSessions and
-OwnableValidator, and some upstream files have no clear licence. **Resolve this before public
-distribution.** Details are in [docs/SECURITY_REVIEW.md §7](docs/SECURITY_REVIEW.md).
-# binance-hack-solution
+The code in this repository is [MIT](LICENSE), and the contracts in `src/` compile only MIT
+sources (`./script/check-licenses.sh` checks this). The dependencies have other licenses,
+including AGPL-3.0 for parts of SmartSessions and OwnableValidator, and a few upstream files
+have no license tag at all. If you deploy or redistribute this stack, check those terms
+yourself. The full inventory is in [docs/SECURITY_REVIEW.md §7](docs/SECURITY_REVIEW.md#7-licensing).

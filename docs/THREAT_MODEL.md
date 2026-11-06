@@ -55,7 +55,8 @@ executors, hooks or guard). It is not a statement about any Safe.
 
 ## 4. Adversarial review
 
-Each row is a privilege-escalation path from the brief: the result and the test that checks it.
+Each row is one way an attacker holding a session key could try to gain more authority, with the
+result and the tests that check it.
 
 | Path | Analysis | Result | Tests |
 |---|---|---|---|

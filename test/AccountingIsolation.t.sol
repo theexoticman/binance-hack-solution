@@ -13,7 +13,7 @@ import { ConfigId } from "src/interfaces/ISessionPolicy.sol";
 import { MaliciousDelegation } from "src/examples/MaliciousDelegation.sol";
 
 /**
- * Item: can failed operations exhaust ANOTHER session's spending allowance?
+ * Test I - isolation: can failed operations exhaust ANOTHER session's spending allowance?
  *
  * Model: usage is recorded in validation, under ConfigId = f(account, permissionId, action). One
  * session can therefore never write another session's counters. The only shared resource is the
