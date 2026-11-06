@@ -4,9 +4,17 @@
   "private": true,
   "description": "Reference template: Safe custody + restricted session keys (Safe7579 + SmartSessions) with an EIP-7702 attack demonstration",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theexoticman/binance-hack-solution.git"
+  },
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "build": "forge build",
     "test": "forge test && forge test --mc Erc7562ComplianceTest -vvv",
+    "fmt": "forge fmt",
+    "fmt:check": "forge fmt --check",
+    "licenses": "./script/check-licenses.sh",
     "demo": "./script/demo.sh"
   },
   "dependencies": {

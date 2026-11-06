@@ -1,6 +1,21 @@
-node_modules/
+# Build output
 out/
 cache/
+
+# Dependencies
+node_modules/
+
+# Local deployments and demo artifacts
 broadcast/
 deployments/
+*.cast
+
+# Secrets
 .env
+.env.*
+
+# Editor and OS files
+.claude/settings.local.json
+.DS_Store
+.vscode/
+.idea/
