@@ -46,13 +46,13 @@ as both transaction guard and module guard. Both give the operator the same mand
 
 | | Path |
 |---|---|
-| Shared suite (31 tests, run against both) | [test/operator-keys/OperatorKeySuite.sol](test/operator-keys/OperatorKeySuite.sol) |
-| A harness + Roles-only tests | [utils/ZodiacRolesHarness.sol](test/operator-keys/utils/ZodiacRolesHarness.sol), [ZodiacRoles.t.sol](test/operator-keys/ZodiacRoles.t.sol) |
-| B harness + 7579/4337-only tests | [utils/SmartSessionsHarness.sol](test/operator-keys/utils/SmartSessionsHarness.sol), [SmartSessions.t.sol](test/operator-keys/SmartSessions.t.sol), [SmartSessionsErc7562.t.sol](test/operator-keys/SmartSessionsErc7562.t.sol) |
-| Gas benchmark | [OperatorKeyGas.t.sol](test/operator-keys/OperatorKeyGas.t.sol) → [snapshots/](snapshots) |
-| Deployment script / on-chain benchmark | [script/DeployOperatorKeys.s.sol](script/DeployOperatorKeys.s.sol), [script/bench-operator-keys.sh](script/bench-operator-keys.sh) → [docs/operator-keys/bench-receipts.txt](docs/operator-keys/bench-receipts.txt) |
-| Calldata the owners sign (shared by tests and script) | [script/lib/OperatorKeySetup.sol](script/lib/OperatorKeySetup.sol) |
-| New policies (MIT, unaudited) | [OwnerOnlyPolicy](src/policies/engine/OwnerOnlyPolicy.sol), [Safe7579BatchPolicy](src/policies/engine/Safe7579BatchPolicy.sol) |
+| Shared suite (31 tests, run against both) | [test/operator-keys/OperatorKeySuite.sol](../test/operator-keys/OperatorKeySuite.sol) |
+| A harness + Roles-only tests | [utils/ZodiacRolesHarness.sol](../test/operator-keys/utils/ZodiacRolesHarness.sol), [ZodiacRoles.t.sol](../test/operator-keys/ZodiacRoles.t.sol) |
+| B harness + 7579/4337-only tests | [utils/SmartSessionsHarness.sol](../test/operator-keys/utils/SmartSessionsHarness.sol), [SmartSessions.t.sol](../test/operator-keys/SmartSessions.t.sol), [SmartSessionsErc7562.t.sol](../test/operator-keys/SmartSessionsErc7562.t.sol) |
+| Gas benchmark | [OperatorKeyGas.t.sol](../test/operator-keys/OperatorKeyGas.t.sol) → [snapshots/](../snapshots) |
+| Deployment script / on-chain benchmark | [script/DeployOperatorKeys.s.sol](../script/DeployOperatorKeys.s.sol), [script/bench-operator-keys.sh](../script/bench-operator-keys.sh) → [docs/operator-keys/bench-receipts.txt](operator-keys/bench-receipts.txt) |
+| Calldata the owners sign (shared by tests and script) | [script/lib/OperatorKeySetup.sol](../script/lib/OperatorKeySetup.sol) |
+| New policies (MIT, unaudited) | [OwnerOnlyPolicy](../src/policies/engine/OwnerOnlyPolicy.sol), [Safe7579BatchPolicy](../src/policies/engine/Safe7579BatchPolicy.sol) |
 
 All main tests use real upstream contracts. The only stand-ins are the test tokens and target
 contracts.
@@ -131,9 +131,9 @@ balance, allowances, Policy Engine entries, and the operator framework's own sta
 | Expired session | Block | — (no expiry, see §4) | ✅ | `B_expiredSession_isRejected`, `A_finding_noNativeOperatorExpiry` |
 | **Invariant (fuzz, 256 runs):** a module tx takes effect only if its exact access key has a configured policy | holds | ✅ | ✅ | `testFuzz_moduleCannotBypassPolicyEngine` |
 
-**Totals [T]:** A 41 tests and B 45 tests, plus 2 ERC-7562 tests and 23 gas tests. The whole
-repository runs `pnpm test` (208 passed, 32 skipped by design), then the tracer pass (9/9) and
-`pnpm gas:operator-keys` (23/23). All 122 pre-existing tests still pass, and so does the attack demo.
+**Totals [T]:** A 41 tests and B 45 tests, plus 2 ERC-7562 tests and 23 gas tests, run by `pnpm test`
+(the ERC-7562 ones in its tracer pass) and `pnpm gas:operator-keys`. All pre-existing tests still
+pass, and so does the attack demo.
 Nothing above is reported as passed without having been executed.
 
 In the misconfiguration check, the operator layer could not even express three cases, so they were
@@ -213,17 +213,17 @@ entries and take effect immediately (`S14`).
 | Gas the Safe pays | None: the operator or relayer pays | Must be capped (`SimpleGasPolicy` + `GasFeeCapPolicy`) | [C] existing template |
 | Delegatecall | Expressible (`ExecutionOptions`); the engine still denies it | Not expressible | [T] `S11` |
 | Self-escalation | Misconfigurable (`allowTarget(Roles)`); engine `OwnerOnly` blocks it | Structurally impossible (`InvalidActionId`) | [T] `S20` |
-| Recipients / selector / zero value | Native conditions DSL | Custom policies (the upstream ones are insufficient, per [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)) | [T] |
+| Recipients / selector / zero value | Native conditions DSL | Custom policies (the upstream ones are insufficient, per [docs/ARCHITECTURE.md](ARCHITECTURE.md)) | [T] |
 
 ---
 
 ## 5. Measured costs
 
 Execution and lifecycle figures are full-transaction gas, including 21,000 intrinsic gas and calldata,
-from `forge test --isolate` ([snapshots/](snapshots)). They use the same Safe, tokens and operations,
+from `forge test --isolate` ([snapshots/](../snapshots)). They use the same Safe, tokens and operations,
 userOps have zero fees unless noted, and the steady-state figures are the second operation of a test.
 Deployment and initial configuration come from anvil broadcast receipts
-([docs/operator-keys/bench-receipts.txt](docs/operator-keys/bench-receipts.txt)). The two sources
+([docs/operator-keys/bench-receipts.txt](operator-keys/bench-receipts.txt)). The two sources
 cross-check: B rotation is 1,138,040 in both.
 
 | Metric | Zodiac Roles | Smart Sessions | B / A |
@@ -330,13 +330,16 @@ is verified to kill it (`A_payloadSignedBeforeRevocation_isRejected`).
   on the module-compromise checks of each scenario.
 - **A compromised operator key keeps its mandate in both architectures:** up to 3000 USDC per day to
   alice/bob until revoked. With the operator module itself compromised, amounts are uncapped (F3).
-- **Sentinel analysis** (§8) is by code inspection of Safenet @ `0c5b4f3`. It was not executed.
+- **Sentinel.** The `SentinelOracle` setup recommended in §8 is built and tested, including on a
+  Gnosis mainnet fork against the production oracle: see [SENTINEL.md](SENTINEL.md). The `Staking`
+  observation is by code inspection of Safenet @ `0c5b4f3` only.
 
 ---
 
 ## 8. Recommendation
 
-**1. SafeNet Sentinel: Zodiac Roles, plus native separation where it exists.**
+**1. SafeNet Sentinel: Zodiac Roles, plus native separation where it exists.** Built and tested:
+[SENTINEL.md](SENTINEL.md).
 
 First verify where the contracts themselves already separate funds from identity [C, Safenet @ `0c5b4f3`]:
 
@@ -349,8 +352,10 @@ First verify where the contracts themselves already separate funds from identity
   the two, governance registers a **Safe** as the sentinel, and a long-lived operator key drives
   `commit`/`reveal`/`finalize`/`claim` through Roles. The bond allowance to the oracle is set by the
   owners only, and the engine has entries for exactly those selectors.
-- **Residual risk:** a stolen sentinel key can still forfeit bonds by committing without revealing.
-  Bound this with a Roles call allowance on `commit` and a capped token allowance [A, not built].
+- **Residual risk:** a stolen sentinel key can still bond 800 USDC.e on every open request until it
+  is revoked, and forfeit those bonds by not revealing. The built setup caps each approval at one
+  bond, in both Roles and the engine; it has no budget across requests
+  (`test_finding_leakedKeyCanBondEveryRequestUntilRevoked`).
 
 Roles fits this case: a long-lived key, a handful of fixed selectors, no expiry needed, no bundler,
 the cheapest operations, and no ERC-7562 conflict.

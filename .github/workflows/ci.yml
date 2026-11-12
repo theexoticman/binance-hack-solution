@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true # lib/safenet, for the sentinel tests
 
       - uses: pnpm/action-setup@v4
         with:
@@ -38,6 +40,14 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Sentinel fork tests (Gnosis mainnet)
+        # Runs only when the repository has a GNOSIS_RPC_URL secret (forks and PRs from forks don't).
+        env:
+          GNOSIS_RPC_URL: ${{ secrets.GNOSIS_RPC_URL }}
+        run: |
+          if [ -n "$GNOSIS_RPC_URL" ]; then pnpm test:fork:sentinel
+          else echo "GNOSIS_RPC_URL secret not set; skipping the fork suite"; fi
 
       - name: Check licenses of src/
         run: ./script/check-licenses.sh

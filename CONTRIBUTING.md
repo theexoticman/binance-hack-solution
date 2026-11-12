@@ -53,6 +53,7 @@ commits.
 You need [Foundry](https://getfoundry.sh) ≥ 1.0, [pnpm](https://pnpm.io) and `jq`.
 
 ```bash
+git submodule update --init lib/safenet   # SafeNet sources for the sentinel tests
 pnpm install    # Solidity dependencies, pinned in pnpm-lock.yaml
 pnpm build
 ```
@@ -70,6 +71,11 @@ pnpm test                    # full suite, including the ERC-7562 tracer tests
 ./script/check-licenses.sh   # src/ must compile only MIT/Apache sources
 ./script/demo.sh             # end-to-end demo on a local anvil chain
 ```
+
+If you touch the sentinel, also run its fork suite against Gnosis mainnet:
+`GNOSIS_RPC_URL=<rpc> pnpm test:fork:sentinel`. CI runs it only when the repository has that
+secret. If you change the operator-key comparison, rerun `pnpm gas:operator-keys` and commit the
+updated `snapshots/`.
 
 If you add a deployed contract, change a contract's external functions or update dependencies,
 run `./script/gen-admin-surface.sh` to regenerate `test/utils/AdminSurface.sol`. That file lists
@@ -93,6 +99,16 @@ Test names carry a letter that says which question they answer:
 | `test_gas_` | `GasAccounting.t.sol` | Is the Safe's gas outflow bounded by the session's gas budget? |
 | `test_7562_` | `Erc7562Compliance.t.sol` | Which contracts break the ERC-4337 mempool rules? |
 
+The operator-key comparison and the sentinel have their own suites:
+
+| Prefix | Location | Question |
+|---|---|---|
+| `test_S01_` … `test_S22_` | `test/operator-keys/OperatorKeySuite.sol` | The shared scenarios, run against both architectures |
+| `test_A_`, `test_B_` | `test/operator-keys/ZodiacRoles.t.sol`, `SmartSessions*.t.sol` | Behaviour specific to Roles (A) or Smart Sessions (B) |
+| `test_gas_` | `test/operator-keys/OperatorKeyGas.t.sol` | Gas of both, for `snapshots/` |
+| `test_setup_`, `test_allow_`, `test_block_`, `test_rotation_`, `test_market_`, `test_migration_`, `test_finding_` | `test/sentinel/SentinelSafe.t.sol` | The sentinel Safe, by topic |
+| `test_fork_` | `test/sentinel/SentinelSafeFork.t.sol` | The sentinel against production SafeNet on Gnosis |
+
 New tests go in the file whose question they answer, using its prefix. Most tests inherit
 [`test/utils/SessionTestBase.sol`](test/utils/SessionTestBase.sol), which deploys the real Safe,
 Safe7579, EntryPoint, SmartSession and policies.
@@ -108,8 +124,9 @@ scrutiny:
 
 - Follow the rules in [docs/ADDING_POLICIES.md §2](docs/ADDING_POLICIES.md#2-implement):
   namespace state, fail closed, decode strictly, no trust in `msg.sender` or `tx.origin`.
-- Import only `src/interfaces/ISessionPolicy.sol` and permissively licensed code. The license
-  check fails otherwise.
+- Import only the MIT interfaces (`src/interfaces/` for the template and the comparison,
+  `src/sentinel/ISafePolicy.sol` for the sentinel) and permissively licensed code. The license
+  check fails otherwise. The sentinel shares no sources with the other two parts; keep it that way.
 - Include a positive test (the allowed case works) and negative tests with exact revert reasons.
 - Update the docs that describe the behaviour you changed: `ARCHITECTURE.md`, `THREAT_MODEL.md`
   or `SECURITY_REVIEW.md`.
