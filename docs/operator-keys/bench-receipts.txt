@@ -1,0 +1,89 @@
+# Receipt gas per transaction (anvil, Prague, forge Version: 1.5.1-stable)
+# operator signer: wallet
+
+## shared  (total 11115978)
+1253791	CREATE2	Integrity	-	status=0x1
+493005	CREATE2	Packer	-	status=0x1
+2604274	CREATE	Safe	-	status=0x1
+423608	CREATE	SafeProxyFactory	-	status=0x1
+139331	CREATE	MultiSendCallOnly	-	status=0x1
+969117	CREATE	CompatibilityFallbackHandler	-	status=0x1
+1744882	CREATE	-	-	status=0x1
+597704	CREATE	-	-	status=0x1
+428681	CREATE	-	-	status=0x1
+591600	CREATE	-	-	status=0x1
+315652	CREATE	-	-	status=0x1
+256685	CREATE	-	-	status=0x1
+238816	CREATE	OwnerOnlyPolicy	-	status=0x1
+529362	CREATE	TestToken	-	status=0x1
+529470	CREATE	TestToken	-	status=0x1
+
+## zodiacSingletons  (total 6195527)
+5451016	CREATE	Roles	-	status=0x1
+247938	CREATE	ModuleProxyFactory	-	status=0x1
+496573	CREATE	MultiSendUnwrapper	-	status=0x1
+
+## sessionsSingletons  (total 15260560)
+4785076	CREATE	Safe7579.zodiac-roles	-	status=0x1
+5109570	CREATE	SmartSession.zodiac-roles	-	status=0x1
+1471749	CREATE	OwnableValidator.zodiac-roles	-	status=0x1
+450089	CREATE	TimeFramePolicy.zodiac-roles	-	status=0x1
+495319	CREATE	SimpleGasPolicy.zodiac-roles	-	status=0x1
+354466	CREATE	GasFeeCapPolicy.zodiac-roles	-	status=0x1
+616380	CREATE	FunctionWhitelistPolicy.zodiac-roles	-	status=0x1
+558417	CREATE	AddressWhitelistPolicy.zodiac-roles	-	status=0x1
+956476	CREATE	SpendingLimitPolicy.zodiac-roles	-	status=0x1
+463018	CREATE	Safe7579BatchPolicy.zodiac-roles	-	status=0x1
+
+## zodiacSafe  (total 521399)
+332987	CALL	-	createProxyWithNonce(address,bytes,uint256)	status=0x1
+188412	CALL	-	deployModule(address,bytes,uint256)	status=0x1
+
+## sessionsSafe  (total 332987)
+332987	CALL	-	createProxyWithNonce(address,bytes,uint256)	status=0x1
+
+## fund  (total 293966)
+68391	CALL	-	mint(address,uint256)	status=0x1
+68391	CALL	-	mint(address,uint256)	status=0x1
+27301	CALL	-	-	status=0x1
+51291	CALL	-	mint(address,uint256)	status=0x1
+51291	CALL	-	mint(address,uint256)	status=0x1
+27301	CALL	-	-	status=0x1
+
+## zodiacConfigure  (total 971893)
+419373	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+128874	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+303538	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+120108	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+
+## sessionsConfigure  (total 1829947)
+225949	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+1030223	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+453667	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+120108	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+
+## zodiacExec  (total 197430)
+197430	CALL	-	execTransactionWithRole(address,uint256,bytes,uint8,bytes32,bool)	status=0x1
+
+## sessionsExec  (total 374621)
+374621	CALL	-	handleOps((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes)[],address)	status=0x1
+
+## zodiacBatch  (total 284965)
+284965	CALL	-	execTransactionWithRole(address,uint256,bytes,uint8,bytes32,bool)	status=0x1
+
+## sessionsBatch  (total 350258)
+350258	CALL	-	handleOps((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes)[],address)	status=0x1
+
+## zodiacRotate  (total 359726)
+178026	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+181700	CALL	-	execTransactionWithRole(address,uint256,bytes,uint8,bytes32,bool)	status=0x1
+
+## sessionsRotate  (total 1446695)
+1138028	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+308667	CALL	-	handleOps((address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes)[],address)	status=0x1
+
+## zodiacRevoke  (total 98661)
+98661	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1
+
+## sessionsRevoke  (total 262191)
+262191	CALL	-	execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)	status=0x1

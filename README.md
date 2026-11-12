@@ -148,6 +148,7 @@ business-hours policy).
 | [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) | Trust assumptions and the adversarial review, path by path |
 | [docs/ADDING_POLICIES.md](docs/ADDING_POLICIES.md) | Writing, testing and attaching a policy |
 | [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Internal review: findings, test evidence, open items |
+| [OPERATOR_KEY_COMPARISON.md](OPERATOR_KEY_COMPARISON.md) | Zodiac Roles vs. Smart Sessions behind Safe Policy Engine (Safe v1.5.0): shared security suite, gas, recommendation |
 
 ## Contributing
 

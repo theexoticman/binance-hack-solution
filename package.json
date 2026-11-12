@@ -11,26 +11,37 @@
   "packageManager": "pnpm@10.28.0",
   "scripts": {
     "build": "forge build",
-    "test": "forge test && forge test --mc Erc7562ComplianceTest -vvv",
+    "test": "forge test && forge test --mc Erc7562 -vvv",
     "fmt": "forge fmt",
     "fmt:check": "forge fmt --check",
     "licenses": "./script/check-licenses.sh",
-    "demo": "./script/demo.sh"
+    "demo": "./script/demo.sh",
+    "gas:operator-keys": "OPERATOR_KEY_GAS=true forge test --mc OperatorKeyGas --isolate",
+    "bench:operator-keys": "./script/bench-operator-keys.sh",
+    "test:fork:sentinel": "forge test --mc SentinelSafeForkTest -vv"
   },
   "dependencies": {
+    "@gnosis.pm/zodiac": "3.4.1",
     "@openzeppelin/contracts": "5.1.0",
+    "@openzeppelin/contracts-upgradeable": "5.1.0",
     "@rhinestone/checknsignatures": "github:rhinestonewtf/checknsignatures#c984c03cdefda75fdb82b6e9b552cdf3315d5242",
     "@rhinestone/core-modules": "github:rhinestonewtf/core-modules#2eda90a",
     "@rhinestone/flatbytes": "github:rhinestonewtf/flatbytes#8182dc7353bef886be234c54ae36b1e33d6bf8ee",
     "@rhinestone/modulekit": "0.4.10",
+    "@safe-global/safe-smart-account": "1.5.0",
     "forge-std": "github:foundry-rs/forge-std#v1.9.7",
-    "smartsessions": "github:erc7579/smartsessions#f5aaf867f7e22f3b9d746ce6f404f3a56833757f"
+    "policy-engine": "github:safe-research/policy-engine#8ee68a8cdac65b4aba5d9a10e9f9018c2efb10b3",
+    "smartsessions": "github:erc7579/smartsessions#f5aaf867f7e22f3b9d746ce6f404f3a56833757f",
+    "zodiac-modifier-roles": "github:gnosisguild/zodiac-modifier-roles#218a5164d739c107b132034436978e78cdd90c95&path:/packages/evm"
   },
   "pnpm": {
     "overrides": {
       "FreshCryptoLib": "-",
       "freshcryptolib": "-",
       "webauthn-sol": "-"
+    },
+    "patchedDependencies": {
+      "@gnosis.pm/zodiac@3.4.1": "patches/@gnosis.pm__zodiac@3.4.1.patch"
     }
   }
 }

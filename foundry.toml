@@ -12,7 +12,31 @@ optimizer_runs = 200
 bytecode_hash = "none"
 # Deterministic start time so period-based limits are easy to reason about in tests.
 block_timestamp = 1_750_000_000
-fs_permissions = [{ access = "read-write", path = "./deployments" }]
+fs_permissions = [{ access = "read-write", path = "./deployments" }, { access = "read", path = "./out" }]
+# Safe Policy Engine is built upstream with viaIR and 10M optimizer runs and does not compile without
+# viaIR. Scope that profile to its sources (and to the one file that pulls them in) so the rest of
+# the repository keeps its existing bytecode and gas figures.
+# Zodiac Roles v2.1.1 is built upstream with 100 optimizer runs; at this repository's 200 runs its
+# runtime is 24 814 bytes, over the EIP-170 limit (24 576), so it could not be deployed.
+additional_compiler_profiles = [
+    { name = "policy-engine", via_ir = true, optimizer_runs = 10_000_000 },
+    { name = "zodiac-roles", optimizer_runs = 100 },
+    # Safenet's SentinelOracle (lib/safenet @ c355af1) with its upstream production settings.
+    { name = "safenet", via_ir = true, optimizer_runs = 1_000_000 },
+]
+compilation_restrictions = [
+    { paths = "node_modules/zodiac-modifier-roles/contracts/**", max_optimizer_runs = 100 },
+    # The operator-key comparison compiles BOTH architectures (and Safe v1.5.0, fixtures) with the
+    # same settings, so shared components have identical bytecode and gas in A and B.
+    { paths = "test/operator-keys/**", max_optimizer_runs = 100 },
+    { paths = "script/DeployOperatorKeys.s.sol", max_optimizer_runs = 100 },
+    { paths = "script/lib/OperatorKeySetup.sol", max_optimizer_runs = 100 },
+    { paths = "lib/safenet/contracts/src/**", via_ir = true, min_optimizer_runs = 1_000_000, max_optimizer_runs = 1_000_000 },
+    { paths = "test/sentinel/artifacts/SentinelOracleArtifacts.sol", via_ir = true, min_optimizer_runs = 1_000_000, max_optimizer_runs = 1_000_000 },
+    { paths = "test/sentinel/artifacts/SentinelEngineArtifacts.sol", via_ir = true, min_optimizer_runs = 10_000_000 },
+    { paths = "node_modules/policy-engine/contracts/**", via_ir = true, min_optimizer_runs = 10_000_000 },
+    { paths = "test/utils/PolicyEngineArtifacts.sol", via_ir = true, min_optimizer_runs = 10_000_000 },
+]
 
 [profile.default.lint]
 # Third-party sources under node_modules are not ours to lint.

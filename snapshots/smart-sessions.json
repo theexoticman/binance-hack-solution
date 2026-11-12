@@ -1,0 +1,13 @@
+{
+  "authorizedExecution": "306197",
+  "authorizedExecution_first": "391697",
+  "authorizedExecution_withPrefund": "366618",
+  "batchedExecution_2": "367334",
+  "batchedExecution_5": "463009",
+  "erc4337_execute_only": "111315",
+  "erc4337_handleOps_total": "306197",
+  "erc4337_validateUserOp_only": "209710",
+  "operatorRegistration": "1032397",
+  "operatorRevocation": "262172",
+  "operatorRotation": "1138040"
+}
