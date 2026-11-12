@@ -30,7 +30,11 @@ jobs:
           version: v1.5.1
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        # pnpm clones git dependencies that use `&path:` (Zodiac Roles) over SSH, and the runner has
+        # no SSH key; fetch them over HTTPS instead.
+        run: |
+          git config --global url."https://github.com/".insteadOf git@github.com:
+          pnpm install --frozen-lockfile
 
       - name: Check formatting
         run: forge fmt --check

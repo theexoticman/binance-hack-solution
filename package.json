@@ -32,7 +32,7 @@
     "forge-std": "github:foundry-rs/forge-std#v1.9.7",
     "policy-engine": "github:safe-research/policy-engine#8ee68a8cdac65b4aba5d9a10e9f9018c2efb10b3",
     "smartsessions": "github:erc7579/smartsessions#f5aaf867f7e22f3b9d746ce6f404f3a56833757f",
-    "zodiac-modifier-roles": "github:gnosisguild/zodiac-modifier-roles#218a5164d739c107b132034436978e78cdd90c95&path:/packages/evm"
+    "zodiac-modifier-roles": "git+https://github.com/gnosisguild/zodiac-modifier-roles.git#218a5164d739c107b132034436978e78cdd90c95&path:/packages/evm"
   },
   "pnpm": {
     "overrides": {

@@ -52,7 +52,7 @@ importers:
         specifier: github:erc7579/smartsessions#f5aaf867f7e22f3b9d746ce6f404f3a56833757f
         version: https://codeload.github.com/erc7579/smartsessions/tar.gz/f5aaf867f7e22f3b9d746ce6f404f3a56833757f(ethers@5.8.0)(hardhat@2.29.1(typescript@4.9.5))(lodash@4.18.1)(typechain@5.2.0(typescript@4.9.5))(typescript@4.9.5)
       zodiac-modifier-roles:
-        specifier: github:gnosisguild/zodiac-modifier-roles#218a5164d739c107b132034436978e78cdd90c95&path:/packages/evm
+        specifier: git+https://github.com/gnosisguild/zodiac-modifier-roles.git#218a5164d739c107b132034436978e78cdd90c95&path:/packages/evm
         version: '@gnosis.pm/zodiac-modifier-roles@git+https://git@github.com:gnosisguild/zodiac-modifier-roles.git#218a5164d739c107b132034436978e78cdd90c95&path:/packages/evm'
 
 packages:
@@ -285,7 +285,7 @@ packages:
       ethers: ^5.1.4
 
   '@gnosis.pm/zodiac-modifier-roles@git+https://git@github.com:gnosisguild/zodiac-modifier-roles.git#218a5164d739c107b132034436978e78cdd90c95&path:/packages/evm':
-    resolution: {commit: 218a5164d739c107b132034436978e78cdd90c95, path: /packages/evm, repo: git@github.com:gnosisguild/zodiac-modifier-roles.git, type: git}
+    resolution: {commit: 218a5164d739c107b132034436978e78cdd90c95, path: /packages/evm, repo: https://github.com/gnosisguild/zodiac-modifier-roles.git, type: git}
     version: 2.1.1
 
   '@gnosis.pm/zodiac@3.4.1':
