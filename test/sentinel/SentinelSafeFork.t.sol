@@ -213,7 +213,7 @@ contract SentinelSafeForkTest is SentinelSafeTest {
 
     /**
      * @dev Validation, SIMULATED. Validators watch for `OracleResult(approved = true)` and then produce
-     *      a FROST threshold signature off-chain; a fork cannot produce that signature. Only the
+     *      a FROST threshold signature offchain; a fork cannot produce that signature. Only the
      *      coordinator's signature check is mocked; Consensus' own attestation logic runs for real.
      */
     function _simulateAttestation(Proposal memory p) internal {

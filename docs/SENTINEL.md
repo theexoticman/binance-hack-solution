@@ -85,8 +85,11 @@ nothing (`test_market_rolesAloneIsNotEnough`). Removal is `rolesRemoveMarket` (`
 - **The treasury entry admits modules.** Upstream `ERC20TransferPolicy` doesn't distinguish owner and
   module transactions, so a compromised Roles module could pay the treasury, and only the treasury
   (`test_finding_moduleCanReachTheTreasuryEntry`).
-- **No deployment script yet.** The tests build the owner transactions with
-  [`SentinelSetup`](../script/sentinel/SentinelSetup.sol), which a deployment script would reuse.
+- **Deployment.** A new sentinel Safe can be deployed in one transaction from
+  [safe-factory/examples/safenet-sentinel.json](../safe-factory/examples/safenet-sentinel.json)
+  (see [safe-factory/](../safe-factory/)), with the same role key and mandate. Its admin entries also
+  include Roles `revokeFunction` and `setAllowance`. The owner transactions for an existing Safe are
+  in [`SentinelSetup`](../script/sentinel/SentinelSetup.sol).
 
 ## Tests
 

@@ -126,7 +126,7 @@ Always include:
 ## 4. Register (deploy)
 
 Policies are stateless singletons: deploy once per chain and share them across Safes and
-sessions. Namespacing isolates them. There is no on-chain registry in this template.
+sessions. Namespacing isolates them. There is no onchain registry in this template.
 SmartSessions' `ConfigLib` checks ERC-165 (`supportsInterface`) when a policy is enabled.
 `SessionPolicyBase` reports `IPolicy` and `IActionPolicy`. For production, consider an ERC-7484
 module registry with attestations, and pin policy addresses in your deployment configuration.

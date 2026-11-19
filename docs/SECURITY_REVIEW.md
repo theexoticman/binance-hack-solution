@@ -62,13 +62,13 @@ fee within the cap, any basefee, and any bundler.
 - ETH parked in the EntryPoint deposit is still Safe property, recoverable only by leadership
   (`test_gas_sessionCannotWithdrawEntryPointDeposit`).
 
-**Is gas part of the withdrawal budget? Yes, for risk sizing.** It is a separate on-chain counter
+**Is gas part of the withdrawal budget? Yes, for risk sizing.** It is a separate onchain counter
 in the same asset. The worst-case ETH loss of one compromised session, revoked after it touched
 `k` spending windows, is:
 
 `ETH maxPerPeriod × k + gasCostLimit`, to whitelisted beneficiaries and to bundlers respectively.
 
-The two counters are not merged on-chain: gas is lifetime-scoped and worst-case-priced, spending
+The two counters are not merged onchain: gas is lifetime-scoped and worst-case-priced, spending
 is per-window. Merging them would couple two policies' state. Set `gasCostLimit` deliberately
 small and count it in the ETH risk budget.
 

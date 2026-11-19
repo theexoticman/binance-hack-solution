@@ -22,7 +22,7 @@ import { TransferLib } from "../libraries/TransferLib.sol";
  *    in the current window.
  *  - Uses `block.timestamp` during validation. That is banned by ERC-7562 for the *public* 4337
  *    mempool (OP-011), so operations must be submitted by the operator's own bundler. This is a
- *    mempool-compatibility constraint only; on-chain enforcement does not depend on the bundler.
+ *    mempool-compatibility constraint only; onchain enforcement does not depend on the bundler.
  *
  * initData: `abi.encode(AssetLimit[])`. Re-initialising replaces the whole set of limits.
  */

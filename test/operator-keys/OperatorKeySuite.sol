@@ -14,7 +14,7 @@ import { UnauthorizedTarget, Drainer, TestToken } from "./utils/OperatorKeyFixtu
  * @title Shared operator-key security suite
  * @notice Runs unchanged against both architectures (ZodiacRoles.t.sol, SmartSessions.t.sol).
  *
- * Every prohibited scenario is checked three ways, and each check asserts on-chain EFFECTS
+ * Every prohibited scenario is checked three ways, and each check asserts onchain EFFECTS
  * (owners, threshold, modules, both guards, fallback handler, singleton, all balances, allowances,
  * policy entries, operator-framework state), not only revert status:
  *

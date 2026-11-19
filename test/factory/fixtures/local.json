@@ -1,0 +1,61 @@
+{
+  "name": "factory-test",
+  "safe": {
+    "owners": [
+      "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf",
+      "0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF",
+      "0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69"
+    ],
+    "threshold": 2,
+    "saltNonce": 7
+  },
+  "policyEngine": {
+    "delay": 86400,
+    "expiry": 604800,
+    "ownerSwapMaxAbsent": 1
+  },
+  "roles": [
+    {
+      "name": "PAYOUTS",
+      "members": ["0x1efF47bc3a10a45D4B230B5d10E37751FE6AA718"],
+      "permissions": [
+        {
+          "kind": "transfer",
+          "token": "0x1000000000000000000000000000000000000001",
+          "recipients": ["0x00000000000000000000000000000000000a11ce", "0x0000000000000000000000000000000000000b0b"],
+          "maxPerTx": "1000",
+          "maxPerPeriod": "3000",
+          "period": 86400
+        },
+        {
+          "kind": "approve",
+          "token": "0x1000000000000000000000000000000000000001",
+          "spenders": ["0x000000000000000000000000000000000000fa17"],
+          "maxAmount": "500.5"
+        },
+        {
+          "kind": "call",
+          "target": "0x1000000000000000000000000000000000000002",
+          "functions": ["ping(uint256)", "pong()"]
+        }
+      ]
+    },
+    {
+      "name": "TREASURY",
+      "members": ["0xe1AB8145F7E55DC933d51a18c793F901A3A0b276"],
+      "permissions": [
+        {
+          "kind": "transfer",
+          "token": "0x1000000000000000000000000000000000000001",
+          "recipients": ["0x00000000000000000000000000000000000ca201"]
+        }
+      ]
+    }
+  ],
+  "ownerWithdrawals": [
+    {
+      "token": "0x1000000000000000000000000000000000000001",
+      "recipients": ["0x0000000000000000000000000000000000007ea5"]
+    }
+  ]
+}

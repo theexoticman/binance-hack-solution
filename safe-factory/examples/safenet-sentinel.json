@@ -1,0 +1,55 @@
+{
+  "$schema": "../schema.json",
+  "_readme": "SafeNet sentinel on Gnosis Chain (docs/SENTINEL.md). Replace every 0x1111...-style placeholder before deploying; the script refuses to deploy them.",
+  "name": "safenet-sentinel",
+  "safe": {
+    "owners": [
+      "0x1111111111111111111111111111111111111111",
+      "0x2222222222222222222222222222222222222222",
+      "0x3333333333333333333333333333333333333333",
+      "0x4444444444444444444444444444444444444444",
+      "0x5555555555555555555555555555555555555555"
+    ],
+    "threshold": 3,
+    "saltNonce": 0
+  },
+  "policyEngine": {
+    "delay": 86400,
+    "expiry": 604800,
+    "ownerSwapMaxAbsent": 1
+  },
+  "roles": [
+    {
+      "name": "SENTINEL",
+      "_key": "keccak256(\"SENTINEL\"), the key script/sentinel/SentinelSetup.sol uses",
+      "key": "0xd3eedd6d69d410e954f4c622838ecc3acae9fdcd83cad412075c85b092770656",
+      "members": ["0x6666666666666666666666666666666666666666"],
+      "permissions": [
+        {
+          "kind": "approve",
+          "_note": "USDC.e bond for the production SentinelOracle: at most one bond (0.40 fee x 2000)",
+          "token": "0x2a22f9c3b484c3629090FeED35F17Ff8F88f76F0",
+          "spenders": ["0x4F61B8832978e83b80D69551AEf07557DBE41d03"],
+          "maxAmount": "800"
+        },
+        {
+          "kind": "call",
+          "target": "0x4F61B8832978e83b80D69551AEf07557DBE41d03",
+          "functions": [
+            "commit(bytes32,bytes32)",
+            "reveal(bytes32,bool,bytes32,string)",
+            "finalize(bytes32)",
+            "claim(bytes32)",
+            "timeoutArbitration(bytes32)"
+          ]
+        }
+      ]
+    }
+  ],
+  "ownerWithdrawals": [
+    {
+      "token": "0x2a22f9c3b484c3629090FeED35F17Ff8F88f76F0",
+      "recipients": ["0x7777777777777777777777777777777777777777"]
+    }
+  ]
+}

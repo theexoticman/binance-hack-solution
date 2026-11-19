@@ -4,7 +4,7 @@
 EIP-7702 is live). Nothing is mocked: every line is a real transaction. That includes the
 leadership multisig, the session key's ERC-4337 operations, and the type-4 transaction that
 installs the malicious delegation. Blocked attempts are mined and revert. For each one the
-"Why" column names the on-chain control that stopped it.
+"Why" column names the onchain control that stopped it.
 
 | Act | What happens |
 |---|---|

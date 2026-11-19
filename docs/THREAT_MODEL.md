@@ -69,7 +69,7 @@ result and the tests that check it.
 | **Batching** | SmartSession checks every batch element against the same policies and shared state. One bad element rejects the whole op. Aggregate limits accumulate within a batch and across a bundle. | Blocked | `test_C_batchSmugglingOneBadCall`, `test_C_aggregateLimitWithinOneBatch`, `test_C_aggregateLimitWithinOneBundle`, `test_C_emptyBatch` |
 | **ERC-7579 module management** | `installModule`, `uninstallModule`, `setRegistry` and `initializeAccount` on Safe7579 are `onlyEntryPointOrSelf`. Through the EntryPoint they need a SmartSession action for `(account, selector)`, which never exists. | Blocked | `test_B_install7579HookDirectly`, `test_B_uninstallSmartSessionValidator`, `test_B_changeAdapterRegistry`, `test_A_routeInstall7579Executor_unauthorized` |
 | **Fallback handler** | Safe7579 *is* the fallback handler. It authenticates the original caller with ERC-2771 `_msgSender()`, and unknown selectors revert (no 7579 fallback modules installed). Replacing the handler is a Safe self-call (blocked). | Blocked | `test_B_replaceFallbackHandler`, `test_A_routeSafe7579Execute_unauthorized` |
-| **ERC-1271 (Safe signing)** | Sessions have no ERC-7739 content and no 1271 policy, so SmartSession's `isValidSignatureWithSender` returns false. Signatures routed to "no validator" fall back to the owners' `checkSignatures`. This matters because Permit2 and off-chain orders pull funds on a valid 1271 signature. | Blocked | `test_B_sessionCannotProduceSafeErc1271Signature` |
+| **ERC-1271 (Safe signing)** | Sessions have no ERC-7739 content and no 1271 policy, so SmartSession's `isValidSignatureWithSender` returns false. Signatures routed to "no validator" fall back to the owners' `checkSignatures`. This matters because Permit2 and offchain orders pull funds on a valid 1271 signature. | Blocked | `test_B_sessionCannotProduceSafeErc1271Signature` |
 | **ERC-1271 (session signer)** | See §5. The session validator accepts contract signatures. | Finding, bounded by policies | `test_A_erc1271SignerHijack_…` |
 | **"Enable mode"** | SmartSessions can enable a session inside a userOp, if the *account* signed it. The session key can only offer its own signature: it hits `Safe.checkSignatures` (`GS020`), and SmartSession refuses to authorise its own enable flow (`InvalidEnableSignature`). | Blocked | `test_B_enableModeWithForgedSafeSignature`, `test_B_enableModeViaSessionErc1271` |
 | **Allowances / indirect transfers** | Allowance selectors cannot be whitelisted. `transferFrom` is not whitelisted. AddressWhitelist only accepts plain transfers, so routers and forwarders fail even if mistakenly whitelisted. | Blocked | `test_C_erc20Approve`, `test_C_erc20TransferFrom`, `test_C_intermediateContractCannotLaunderBeneficiary`, `test_C_config_functionPolicyRejectsDangerousEntries` |
@@ -184,7 +184,7 @@ which GasFeeCapPolicy rejects.
 
 Sessions that include SpendingLimitPolicy therefore need the operator's own bundler, or a bundler
 that relaxes these rules. Bundlers differ, so verify on the target network. **This is a liveness
-and compatibility constraint only: the on-chain checks do not depend on who bundles**
+and compatibility constraint only: the onchain checks do not depend on who bundles**
 (`test_A_delegatedEoaAsBundler` uses the attacker as bundler).
 
 ## 8. Before mainnet

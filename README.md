@@ -10,15 +10,28 @@ day. When those keys also hold the funds, stealing one key is enough to drain ev
 repository shows how to **separate funds from actions** with a [Safe](https://safe.global)
 smart account, and implements and compares two ways of doing it.
 
+**Want a Safe set up this way?** [Deploy your own](#deploy-your-own-policy-restrained-operator-keys)
+from one config file, in one transaction.
+
 > Proof of concept. It demonstrates the architecture and provides reusable, tested components; it
 > is not production custody infrastructure and has not been audited.
+
+## What you will find in this repository
+
+| Part | What it is | Where |
+|---|---|---|
+| **Policy-restrained operator keys** | A ready-to-use deployer: one config file and one transaction give you a new Safe with its owners, operational keys (Zodiac Roles) and policies (Safe Policy Engine) | [Deploy your own](#deploy-your-own-policy-restrained-operator-keys), [safe-factory/](safe-factory/) |
+| **Two approaches, compared** | Session keys (Smart Sessions) and Zodiac Roles, each behind Safe Policy Engine, run through one shared security suite of 31 attack scenarios, with gas and attack-surface measurements and a recommendation | [Two approaches](#two-approaches), [docs/OPERATOR_KEY_COMPARISON.md](docs/OPERATOR_KEY_COMPARISON.md) |
+| **Session-key template and attack demo** | The original Smart Sessions setup with four MIT session policies, and a recorded demo where a stolen key delegated to malicious EIP-7702 code fails to drain the Safe | [src/policies/](src/policies), [docs/DEMO.md](docs/DEMO.md) |
+| **A real workload: SafeNet sentinel** | The recommended approach applied to a SafeNet sentinel, tested against the production oracle on a Gnosis mainnet fork | [docs/SENTINEL.md](docs/SENTINEL.md) |
+| **Design documents** | Architecture, threat model, security review, how to write a policy | [Documentation](#documentation) |
 
 ## The idea
 
 ```mermaid
 flowchart LR
   owners["Owners<br/>(multisig)"] -->|full control| safe["Safe<br/>holds the funds"]
-  key["Operational key<br/>(server, bot, agent)"] -->|scoped actions only| layer["Restriction layer<br/>(on-chain)"]
+  key["Operational key<br/>(server, bot, agent)"] -->|scoped actions only| layer["Policy layer<br/>(onchain)"]
   layer --> safe
 ```
 
@@ -27,9 +40,41 @@ flowchart LR
   it can move funds without limits.
 - **Operational keys get a mandate.** A key can make only the calls it was granted: which
   contract, which function, which arguments, how much.
-- **The mandate is enforced on-chain.** It is checked in the Safe's own execution path, not by an
+- **The mandate is enforced onchain.** It is checked in the Safe's own execution path, not by an
   API in front of it. A stolen key gives an attacker that mandate and nothing more, until the
   owners revoke it.
+
+## Deploy your own: policy-restrained operator keys
+
+The setup this repository recommends (see [Two approaches](#two-approaches)), packaged so anyone
+can deploy it: write a config file with the owners, the
+operational keys and what each key may do, and one transaction creates the Safe with Zodiac Roles
+(the keys) and Safe Policy Engine (the policies) fully configured. No owner signs anything, and the
+Safe never exists without its restrictions.
+
+The deployer covers this Zodiac Roles + Safe Policy Engine setup only. The session-key approach
+(Smart Sessions) has no deployer; its scripts deploy it for the local demo and the benchmark only.
+
+After the [Quick start](#quick-start) install, start from an example and replace its placeholders:
+
+```bash
+cp safe-factory/examples/payouts.json safe-factory/my-safe.json                    # then edit it
+pnpm safe:deploy safe-factory/my-safe.json --rpc-url $RPC_URL                      # dry run
+pnpm safe:deploy safe-factory/my-safe.json --rpc-url $RPC_URL --broadcast --account deployer
+```
+
+`deployer` is any funded account in Foundry's keystore (`cast wallet import deployer --interactive`);
+it gets no rights over the Safe. The script is
+[script/factory/DeployRestrictedSafe.s.sol](script/factory/DeployRestrictedSafe.s.sol), and
+`pnpm safe:e2e` runs the whole flow on a local anvil chain.
+
+Everything is in **[safe-factory/](safe-factory/)**: how it works, the config format, examples
+(USDC payouts, the SafeNet sentinel), the shared contract addresses and the limits.
+
+> **This deploys a new Safe, so the funds have to move.** The keys and policies protect only what the
+> new Safe holds. If your funds sit in a hot wallet, an EOA or an existing Safe today, migrate them to
+> the new Safe once it is deployed and checked, starting with a small test transfer. The operational
+> keys must stop holding funds themselves.
 
 ## Two approaches
 
@@ -77,7 +122,7 @@ itself and with the module deliberately misconfigured.
 | Gas per authorized action | 198,428 | 306,197 |
 | Key rotation (one owner tx) | 178,038 | 1,138,040 |
 | Contracts that can make the Safe act | 2 | 12 |
-| Off-chain infrastructure | none | a private ERC-4337 bundler |
+| Offchain infrastructure | none | a private ERC-4337 bundler |
 | Native key expiry | no | yes |
 
 **Recommendation: Zodiac Roles.** Both blocked every attack. Roles does it with a smaller attack
@@ -117,6 +162,7 @@ pnpm test                                 # everything
 | `pnpm bench:operator-keys` | Deploys and exercises both on anvil, gas from receipts |
 | `forge test --mc SentinelSafeTest` | Sentinel suite, local |
 | `GNOSIS_RPC_URL=<rpc> pnpm test:fork:sentinel` | Sentinel suite on a Gnosis mainnet fork |
+| `pnpm safe:e2e` | Policy-restrained operator keys end to end on anvil: config file to deployed, checked Safe |
 | `./script/check-licenses.sh` | Checks that `src/` compiles only MIT sources |
 
 `pnpm test` runs `forge test`, then the ERC-7562 tests again with `-vvv`; they need Foundry's
@@ -129,6 +175,7 @@ src/
   policies/           session-key policies (approach 1) and their shared base
   policies/engine/    Policy Engine policies for the comparison: OwnerOnly, Safe7579Batch
   sentinel/           Policy Engine policies for the sentinel: ERC20ApproveCap, OwnerOnly
+  factory/            RestrictedSafeSetup: sets up a new Safe from inside its creation transaction
   interfaces/         MIT copies of the SmartSessions and Policy Engine interfaces
   libraries/          TransferLib: strict decoding of ETH and ERC-20 transfers
   examples/           MaliciousDelegation, the attacker's EIP-7702 code in the demo
@@ -137,10 +184,13 @@ script/
   DeployOperatorKeys.s.sol, lib/OperatorKeySetup.sol,
     bench-operator-keys.sh                                          comparison
   sentinel/SentinelSetup.sol                                        sentinel owner transactions
+  factory/                                                          policy-restrained operator keys: deploy script
 test/
   *.t.sol, utils/     session-key template, one file per attack category
   operator-keys/      comparison: shared suite, one harness per approach, gas
   sentinel/           sentinel: local and Gnosis fork suites
+  factory/            policy-restrained operator keys: tests and fixture
+safe-factory/         policy-restrained operator keys: README, example configs, JSON Schema
 docs/                 architecture, threat model, security review, demo, comparison, sentinel
 snapshots/            gas snapshots of the comparison
 lib/safenet/          SafeNet, pinned git submodule (sentinel tests only)
@@ -169,6 +219,7 @@ lib/safenet/          SafeNet, pinned git submodule (sentinel tests only)
 | [docs/DEMO.md](docs/DEMO.md) | The recorded attack demo |
 | [docs/OPERATOR_KEY_COMPARISON.md](docs/OPERATOR_KEY_COMPARISON.md) | Zodiac Roles vs. Smart Sessions behind Safe Policy Engine |
 | [docs/SENTINEL.md](docs/SENTINEL.md) | Running a SafeNet sentinel from a Safe with a Roles key |
+| [safe-factory/README.md](safe-factory/README.md) | Policy-restrained operator keys: deploying a Safe with its keys and policies from one config file |
 
 ## Contributing and security
 

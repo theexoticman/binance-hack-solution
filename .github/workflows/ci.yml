@@ -58,3 +58,6 @@ jobs:
 
       - name: Run the attack demo
         run: ./script/demo.sh
+
+      - name: Deploy a restricted Safe from a config file (local chain, end to end)
+        run: ./script/factory/local-e2e.sh

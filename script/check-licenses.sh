@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 forge build --quiet
 
-OURS="FunctionWhitelistPolicy AddressWhitelistPolicy SpendingLimitPolicy GasFeeCapPolicy
+OURS="FunctionWhitelistPolicy AddressWhitelistPolicy SpendingLimitPolicy GasFeeCapPolicy RestrictedSafeSetup
   src/policies/engine/OwnerOnlyPolicy.sol:OwnerOnlyPolicy Safe7579BatchPolicy
   src/sentinel/OwnerOnlyPolicy.sol:OwnerOnlyPolicy src/sentinel/ERC20ApproveCapPolicy.sol:ERC20ApproveCapPolicy"
 # Safe v1.4.1 (existing template) and v1.5.0 (operator-key comparison) share contract names, so

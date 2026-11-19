@@ -7,7 +7,7 @@
 #   Act 4  leadership is still in control and revokes the session
 #
 # Every step is a real transaction. Blocked operations are mined and revert; for each one the
-# script also prints which on-chain control stopped it (SmartSession's exact revert reason).
+# script also prints which onchain control stopped it (SmartSession's exact revert reason).
 #
 # Usage: ./script/demo.sh            (requires foundry >= 1.0 and jq)
 set -euo pipefail

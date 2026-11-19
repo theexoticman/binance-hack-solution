@@ -1,8 +1,8 @@
 {
-  "name": "safe-session-security",
+  "name": "restricted-operator-keys",
   "version": "0.1.0",
   "private": true,
-  "description": "Reference template: Safe custody + restricted session keys (Safe7579 + SmartSessions) with an EIP-7702 attack demonstration",
+  "description": "Restricted operator keys for Safe: a one-transaction deployer for a Safe with Zodiac Roles keys and a Safe Policy Engine floor, a Zodiac Roles vs. Smart Sessions comparison, and a SafeNet sentinel setup",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -18,7 +18,9 @@
     "demo": "./script/demo.sh",
     "gas:operator-keys": "OPERATOR_KEY_GAS=true forge test --mc OperatorKeyGas --isolate",
     "bench:operator-keys": "./script/bench-operator-keys.sh",
-    "test:fork:sentinel": "forge test --mc SentinelSafeForkTest -vv"
+    "test:fork:sentinel": "forge test --mc SentinelSafeForkTest -vv",
+    "safe:deploy": "forge script script/factory/DeployRestrictedSafe.s.sol --sig 'run(string)'",
+    "safe:e2e": "./script/factory/local-e2e.sh"
   },
   "dependencies": {
     "@gnosis.pm/zodiac": "3.4.1",

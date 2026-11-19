@@ -289,7 +289,7 @@ contract PrivilegeEscalationTest is SessionTestBase {
     //////////////////////////////////////////////////////////////*/
 
     /// @dev The session has no ERC-7739 content and no ERC-1271 policy, so it can never make the Safe
-    ///      "sign" anything (e.g. a Permit2 / off-chain order that would pull funds later).
+    ///      "sign" anything (e.g. a Permit2 / offchain order that would pull funds later).
     function test_B_sessionCannotProduceSafeErc1271Signature() public view {
         assertEq(smartSession.getERC1271Policies(address(safe), permissionId).length, 0);
         bytes32 hash = keccak256("Permit2: transfer all USDC to attacker");

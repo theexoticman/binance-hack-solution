@@ -1,0 +1,36 @@
+{
+  "$schema": "../schema.json",
+  "_readme": "An exchange's hot wallet on Ethereum: a payout key that can send USDC to two payees only, at most 1000 per transfer and 3000 a day. Replace every 0x1111...-style placeholder before deploying; the script refuses to deploy them.",
+  "name": "usdc-payouts",
+  "safe": {
+    "owners": [
+      "0x1111111111111111111111111111111111111111",
+      "0x2222222222222222222222222222222222222222",
+      "0x3333333333333333333333333333333333333333"
+    ],
+    "threshold": 2,
+    "saltNonce": 0
+  },
+  "roles": [
+    {
+      "name": "PAYOUTS",
+      "members": ["0x4444444444444444444444444444444444444444"],
+      "permissions": [
+        {
+          "kind": "transfer",
+          "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "recipients": ["0x5555555555555555555555555555555555555555", "0x6666666666666666666666666666666666666666"],
+          "maxPerTx": "1000",
+          "maxPerPeriod": "3000",
+          "period": 86400
+        }
+      ]
+    }
+  ],
+  "ownerWithdrawals": [
+    {
+      "token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "recipients": ["0x7777777777777777777777777777777777777777"]
+    }
+  ]
+}

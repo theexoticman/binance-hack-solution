@@ -6,7 +6,7 @@ on Zodiac Roles or on Rhinestone Smart Sessions for restricted operator keys?
 **Answer.** Standardize on **Zodiac Roles v2.1.1**. In this comparison both architectures allowed and
 blocked exactly the same operations, and the Policy Engine stopped every bypass attempt in both. Roles
 reaches that result with 2 privileged contracts instead of 12, no ERC-4337 infrastructure, about 400
-fewer lines of custom on-chain code, 35% less gas per execution (6–23% less for batches), and roughly
+fewer lines of custom onchain code, 35% less gas per execution (6–23% less for batches), and roughly
 6–7× cheaper operator registration and rotation. Smart Sessions has one capability Roles v2.1.1 lacks: native expiry. That
 matters for AI agents, but it does not justify supporting a second framework (see
 [§8](#8-recommendation)).
@@ -50,7 +50,7 @@ as both transaction guard and module guard. Both give the operator the same mand
 | A harness + Roles-only tests | [utils/ZodiacRolesHarness.sol](../test/operator-keys/utils/ZodiacRolesHarness.sol), [ZodiacRoles.t.sol](../test/operator-keys/ZodiacRoles.t.sol) |
 | B harness + 7579/4337-only tests | [utils/SmartSessionsHarness.sol](../test/operator-keys/utils/SmartSessionsHarness.sol), [SmartSessions.t.sol](../test/operator-keys/SmartSessions.t.sol), [SmartSessionsErc7562.t.sol](../test/operator-keys/SmartSessionsErc7562.t.sol) |
 | Gas benchmark | [OperatorKeyGas.t.sol](../test/operator-keys/OperatorKeyGas.t.sol) → [snapshots/](../snapshots) |
-| Deployment script / on-chain benchmark | [script/DeployOperatorKeys.s.sol](../script/DeployOperatorKeys.s.sol), [script/bench-operator-keys.sh](../script/bench-operator-keys.sh) → [docs/operator-keys/bench-receipts.txt](operator-keys/bench-receipts.txt) |
+| Deployment script / onchain benchmark | [script/DeployOperatorKeys.s.sol](../script/DeployOperatorKeys.s.sol), [script/bench-operator-keys.sh](../script/bench-operator-keys.sh) → [docs/operator-keys/bench-receipts.txt](operator-keys/bench-receipts.txt) |
 | Calldata the owners sign (shared by tests and script) | [script/lib/OperatorKeySetup.sol](../script/lib/OperatorKeySetup.sol) |
 | New policies (MIT, unaudited) | [OwnerOnlyPolicy](../src/policies/engine/OwnerOnlyPolicy.sol), [Safe7579BatchPolicy](../src/policies/engine/Safe7579BatchPolicy.sol) |
 
@@ -94,7 +94,7 @@ Three of B's entries exist only so that the framework can function at all.
 
 ## 2. Shared security suite: results
 
-Every prohibited scenario is checked three ways. Each check asserts on-chain **effects**, not only
+Every prohibited scenario is checked three ways. Each check asserts onchain **effects**, not only
 revert status: owners, threshold, modules, both guard slots, fallback handler, singleton, every
 balance, allowances, Policy Engine entries, and the operator framework's own state.
 
@@ -194,7 +194,7 @@ writes in `SafePolicyGuard`, and reads in `AllowedModulePolicy`. The upstream si
 (`SmartSessionsErc7562.t.sol`). This holds even for the session variant the existing suite proves
 compliant without the engine. B therefore needs its own bundler, or direct `handleOps` submission
 (which is what the benchmark does). The bundler must also budget gas for the ops' *declared* limits:
-the forge-estimated gas limit made `handleOps` revert on-chain [M].
+the forge-estimated gas limit made `handleOps` revert onchain [M].
 
 **F7. Engine changes take the delay for both architectures; rotation does not [T].** A new destination
 needs a delayed engine change (`S21`: `RootConfigurationPending` until 1 day has passed) *plus* an
@@ -245,7 +245,7 @@ cross-check: B rotation is 1,138,040 in both.
 | Additional dependencies | zodiac 3.4.1 (patched), Roles @218a516, OZ-upgradeable 5.1.0 | modulekit 0.4.10, smartsessions, core-modules, checknsignatures, flatbytes | |
 | External services required | None (any relayer optional) | A bundler: a private one, because of F6 | |
 | Guard coverage | All module and owner txs (5 entries) | All module and owner txs, including validation and prefund (9 entries) | |
-| Custom on-chain code to own (logic lines) | 22 (`OwnerOnlyPolicy`) | ≈419 (`OwnerOnlyPolicy`, `Safe7579BatchPolicy`, 4 session policies + base + `TransferLib`) | |
+| Custom onchain code to own (logic lines) | 22 (`OwnerOnlyPolicy`) | ≈419 (`OwnerOnlyPolicy`, `Safe7579BatchPolicy`, 4 session policies + base + `TransferLib`) | |
 | Licences of the deployed stack [`check-licenses.sh`] | LGPL-3.0 only | adds AGPL-3.0 (SmartSession, OwnableValidator) and GPL-3.0 | |
 
 ¹ Roles mastercopy 5,451,016 + libraries 1,746,796 + unwrapper 496,573 + factory 247,938.
