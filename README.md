@@ -121,7 +121,7 @@ itself and with the module deliberately misconfigured.
 | Shared security suite ([OperatorKeySuite](test/operator-keys/OperatorKeySuite.sol)) | all pass | all pass |
 | Gas per authorized action | 198,428 | 306,197 |
 | Key rotation (one owner tx) | 178,038 | 1,138,040 |
-| Contracts that can make the Safe act | 2 | 12 |
+| Contracts that can make the Safe act | 2 | 12 (6 fixed + 1 per session policy; 6 in the tested setup) |
 | Offchain infrastructure | none | a private ERC-4337 bundler |
 | Native key expiry | no | yes |
 

@@ -140,7 +140,9 @@ In the misconfiguration check, the operator layer could not even express three c
 blocked structurally:
 
 - B, delegatecall: SmartSessions rejects the call type.
-- B, any action on SmartSession itself: `InvalidActionId` (`B_sessionCannotBeGrantedSmartSessionActions`).
+- B, a normal action on SmartSession itself: `InvalidActionId` (`B_sessionCannotBeGrantedSmartSessionActions`).
+  Owners can still allow such calls through the reserved SmartSession action ID, which this check
+  does not use.
 - A, MultiSend reached by CALL: the unwrapper intercepts it (`A_multiSendIsAlwaysUnwrapped`).
 
 In every other misconfigured case, the denial came from the Policy Engine.
@@ -208,11 +210,11 @@ entries and take effect immediately (`S14`).
 | Restriction | A Zodiac Roles v2.1.1 | B Smart Sessions | Evidence |
 |---|---|---|---|
 | Operator expiry | **None.** Requires an owner revocation tx. v3 adds start, end and uses-left per membership, but v3 is BUSL. | `TimeFramePolicy`, enforced by the EntryPoint (`AA22`) | [T] `A_finding_noNativeOperatorExpiry`, `B_expiredSession_isRejected`; v3: [C] |
-| Expiry of a *signed payload* | None. Salt plus consumed-hash replay protection only. | Session expiry; sequential nonce | [T] replay tests; [C] |
+| Expiry of a *signed payload* | None, like any signed but unsent transaction. Salt plus consumed-hash replay protection. | None of its own: a signed userOp stays valid until its nonce is used or the session expires, so this is operator expiry again | [T] replay tests; [C] |
 | Daily budget | Allowance that refills `period` after the last refill | Aligned UTC-day windows (`SpendingLimitPolicy`) | [T] both cap 3000 per day and refill; boundary semantics differ [C] |
 | Gas the Safe pays | None: the operator or relayer pays | Must be capped (`SimpleGasPolicy` + `GasFeeCapPolicy`) | [C] existing template |
-| Delegatecall | Expressible (`ExecutionOptions`); the engine still denies it | Not expressible | [T] `S11` |
-| Self-escalation | Misconfigurable (`allowTarget(Roles)`); engine `OwnerOnly` blocks it | Structurally impossible (`InvalidActionId`) | [T] `S20` |
+| Delegatecall | Off unless an owner grants it per function (`ExecutionOptions`); the engine still denies it | Cannot be enabled: SmartSession rejects the delegatecall call type (`UnsupportedCallType`) | [T] `S11`; [C] |
+| Self-escalation | Misconfigurable: granting Roles itself (`allowTarget(Roles)`) or Safe admin functions escalates; engine `OwnerOnly` blocks it | Also misconfigurable. Only actions on SmartSession itself are refused by default (`InvalidActionId`), and owners can still allow them through the reserved SmartSession action ID. Granting Safe admin functions or Safe7579 `installModule` escalates the same way; engine `OwnerOnly` blocks it | [T] `S20`; [C] |
 | Recipients / selector / zero value | Native conditions DSL | Custom policies (the upstream ones are insufficient, per [docs/ARCHITECTURE.md](ARCHITECTURE.md)) | [T] |
 
 ---
